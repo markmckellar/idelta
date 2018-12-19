@@ -10,8 +10,6 @@
 // Apply the java plugin to add support for Java
 apply plugin: 'eclipse'
 apply plugin: 'java'
-apply plugin: 'war'
-
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -22,13 +20,5 @@ repositories {
 dependencies {
 	compile 'log4j:log4j:1.2.7'
 	compile group: 'com.google.code.gson', name: 'gson', version:'2.7'
-	compile group: 'javax.servlet', name: 'servlet-api', version: '2.5'
 }
 
-war
-{
-	from('src/main/java/org/smaptest/server/web/html') { into 'html' }
-	from('src/main/java/org/smaptest/server') { include 'log4j.properties' into('WEB-INF/classes') }
-	from('src/main/java/org/smaptest/server') { include 'context-template.xml' rename { 'META-INF/content.xml' } }
-	webXml = file('src/main/java/org/smaptest/server/web/WEB-INF/web.xml') // copies a file to WEB-INF/web.xml
-}
