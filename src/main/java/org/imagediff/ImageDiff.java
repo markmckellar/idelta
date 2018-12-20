@@ -33,7 +33,9 @@ public class ImageDiff
 	private File tempFile2;
 	
 	public static void main(String args[]) throws Exception {
-		if(args.length!=3) throw new Exception("Expected 5 argumens : file1 file2 diffFile margin colorDiffCutoff");
+		if(args.length!=3) throw new Exception("Expected 3 argumens, got "+
+				args.length+
+				": file1 file2 diffFile margin colorDiffCutoff");
 		String file1 = args[0];
 		String file2 = args[1];
 		String file3 = args[2];

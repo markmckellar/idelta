@@ -72,7 +72,10 @@ public class ImageDiffMap {
 
 		BufferedImage diffImage = new BufferedImage(width1,height1, BufferedImage.TYPE_INT_ARGB);
 		//Graphics2D bGr = diffImage.createGraphics();
-		
+		double maxColorDistance = 0.0;
+		double maxScale = 0.0;
+		double totalScale = 0.0;
+
 		if((width1 == width2) && (height1 == height2))
 		{
 						
@@ -85,21 +88,40 @@ public class ImageDiffMap {
 							getImage1().getRGB(x, y), 
 							getImage2().getRGB(x, y)
 							);	
-					diffImage.setRGB(x, y,getDiffColorScale(pixelCompare.getPercentDiffExp()).getRGB());
+					double colorDistance = pixelCompare.getColorDistance();
+					if(maxColorDistance<colorDistance) maxColorDistance = colorDistance;
+					double scale = Math.pow(colorDistance/65536.0,0.5);
+					totalScale += scale;
+					if(maxScale<scale) maxScale = scale;
+
+					diffImage.setRGB(x, y,getDiffColorScale(scale).getRGB());
 				}
 			}
 		}
 		//bGr.dispose();
 		this.setDiffImage(diffImage);
+		System.out.println("maxColorDistance="+maxColorDistance);
+		System.out.println("maxScale="+maxScale);
+		System.out.println("averageScale="+totalScale/totalPixles);
+
+		
 	}
 	
 	public Color getDiffColorScale(double scale) throws Exception
     {
+		if(scale>1.0) scale = 1.0;
 		float transparency = new Double(scale).floatValue();   
+		Color diffColor = getDiffColor();
+		if(scale==0.0) {
+			diffColor = Color.white;
+			transparency = 1.0f;
+		}
+		//transparency = 1.0f;
+
     	Color color = new Color(
-    			(float)getDiffColor().getRed()/255f,
-    			(float)getDiffColor().getGreen()/255f,
-    			(float)getDiffColor().getBlue()/255f,transparency);
+    			(float)diffColor.getRed()/255f,
+    			(float)diffColor.getGreen()/255f,
+    			(float)diffColor.getBlue()/255f,transparency);
     	return(color);
     }
 		

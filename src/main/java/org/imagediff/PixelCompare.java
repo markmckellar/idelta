@@ -66,6 +66,18 @@ public class PixelCompare
 	}
 	
 	
+	
+	public double getColorDistance()
+	{
+		double distance = 
+				Math.pow(this.getRedDiff(), 2.0)+
+				Math.pow(this.getGreenDiff(), 2.0)+
+				Math.pow(this.getBlueDiff(), 2.0)
+				;
+		
+		return(distance);
+	}
+	
 	public double getPercentDiffExp()
 	{
 		double percentDiff1 = getHueDiff() / (360.0 * 1.0);
