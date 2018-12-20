@@ -1,20 +1,49 @@
 package org.imagediff;
 
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 
-public class PixelCompare
+public class PixelCompare implements Comparable<PixelCompare>
 {
 	private Point2D point;
 	private int rgb1;
 	private int rgb2;
-	
+	private double colorDistance;
+	private double colorDistanceScale;
 	
 	public PixelCompare(Point2D point, int rgb1, int rgb2)
 	{
 		setPoint(point);
 		this.setRgb1( rgb1 );
 		this.setRgb2( rgb2 );
+		this.setColorDistance(this.getColorDistanceCalc());
+		this.setColorDistanceScale(this.getColorDistanceScaleCalc());
+	}
+
+	public void setBufferedImagePixel(BufferedImage bufferedImage,double cutoff,Color baseColor) throws Exception {
+		if(getColorDistanceScale()>=cutoff)
+			bufferedImage.setRGB(
+					Double.valueOf(getPoint().getX()).intValue(),
+					Double.valueOf(getPoint().getY()).intValue(),
+					baseColor.getRGB());
+	}
+	
+	public Color getDiffColorScale(double cutoff,Color baseColor) throws Exception
+    {
+		double scale = 0.0;
+		if(getColorDistanceScale()>=cutoff) scale = 1.0;
+		float transparency = Double.valueOf(scale).floatValue();   
+	
+    	Color color = new Color(
+    			(float)baseColor.getRed()/255f,
+    			(float)baseColor.getGreen()/255f,
+    			(float)baseColor.getBlue()/255f,transparency);
+    	return(color);
+    }
+	public int compareTo(PixelCompare pc) {
+		return (Double.valueOf(getColorDistance()).compareTo(Double.valueOf(pc.getColorDistance())));
 	}
 
 
@@ -59,15 +88,7 @@ public class PixelCompare
 		return(percentDiff);
 	}
 	
-	public double getPercentDiffExp4()
-	{
-		double percentDiff = getHueDiff() / (360.0 * 1.0);
-		return(percentDiff);
-	}
-	
-	
-	
-	public double getColorDistance()
+	public double getColorDistanceCalc()
 	{
 		double distance = 
 				Math.pow(this.getRedDiff(), 2.0)+
@@ -78,18 +99,11 @@ public class PixelCompare
 		return(distance);
 	}
 	
-	public double getPercentDiffExp()
-	{
-		double percentDiff1 = getHueDiff() / (360.0 * 1.0);
-		double percentDiff2 = getTotalDiff() / (256.0 * 3.0);
-		double percentDiff = (percentDiff1 + percentDiff2)/2.0;
-		return(percentDiff);
-	}
-	
-	public int getHueDiff()
-	{
-		int greenDiff = Math.abs(getHue1() - getHue2());
-		return greenDiff;
+	public double getColorDistanceScaleCalc() {
+		double colorDistance = getColorDistance();
+		double scale = Math.pow(colorDistance/65536.0,0.5);
+		if(scale>1.0) scale = 1.0;
+		return(scale);
 	}
 	
 	public int getHue1() {
@@ -98,23 +112,6 @@ public class PixelCompare
 	
 	public int getHue2() {
 		return( this.getHue(this.getRed2(),this.getGreen2(),this.getBlue2()));
-	}
-
-	
-	public double getPercentDiffExp2()
-	{
-		int totalDiff = getTotalDiff();
-		double percentDiff = (totalDiff*3) / (256.0 * 3.0);
-		if(percentDiff>1.0) percentDiff=1.0;
-		return(percentDiff);
-	}
-
-
-	public double getPercentDiffExp1()
-	{
-		double percentDiff = getTotalDiff() / (256.0);
-		if(percentDiff>1.0) percentDiff=1.0;
-		return(percentDiff);
 	}
 	
 	public int getHue(int red, int green, int blue) {
@@ -249,6 +246,22 @@ public class PixelCompare
 	{
 		int b2 = (getRgb2()) & 0xff;
 		return( b2 );
+	}
+
+	public double getColorDistance() {
+		return colorDistance;
+	}
+
+	public void setColorDistance(double colorDistance) {
+		this.colorDistance = colorDistance;
+	}
+
+	public double getColorDistanceScale() {
+		return colorDistanceScale;
+	}
+
+	public void setColorDistanceScale(double colorDistanceScale) {
+		this.colorDistanceScale = colorDistanceScale;
 	}
 
 

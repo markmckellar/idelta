@@ -46,14 +46,17 @@ public class ImageDiff
 		System.out.println("args="+json);
 		
 		ImageDiff imageCompare = new ImageDiff(file1,file2);
-		ImageDiffMap imageDiffMap = new ImageDiffMap(imageCompare.getImage1(),imageCompare.getImage2(),Color.RED);
+		ImageDiffMap imageDiffMap = new ImageDiffMap(imageCompare.getImage1(),imageCompare.getImage2(),Color.BLACK);
 		imageDiffMap.analyze();
 		
 		if(imageDiffMap.getDiffImage()!=null)
 		{
 			File annotatedBufferedImageFile = new File(file3);	
 			System.out.println("writing to : "+file3);
-		    ImageIO.write(imageDiffMap.getDiffImage(), "png", annotatedBufferedImageFile);
+		    ImageIO.write(imageCompare.overlayImage(
+		    		imageCompare.getImage2(),
+		    		imageDiffMap.getDiffImage()),
+		    		"png", annotatedBufferedImageFile);
 		    System.out.println("wrote : "+file3);
 		}
 		else
@@ -120,6 +123,16 @@ public class ImageDiff
 		BufferedImage bufferedImage = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D bGr = bufferedImage.createGraphics();
 	    bGr.drawImage(scaledImage, 0, 0, null);
+	    bGr.dispose();
+		return(bufferedImage);
+	}
+	
+	public BufferedImage overlayImage(BufferedImage bottom,BufferedImage top) {
+		
+		BufferedImage bufferedImage = new BufferedImage(bottom.getWidth(),bottom.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		Graphics2D bGr = bufferedImage.createGraphics();
+	    bGr.drawImage(bottom, 0, 0, null);
+	    bGr.drawImage(top, 0, 0, null);
 	    bGr.dispose();
 		return(bufferedImage);
 	}
