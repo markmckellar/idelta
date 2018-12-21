@@ -46,16 +46,26 @@ public class ImageDiff
 		System.out.println("args="+json);
 		
 		ImageDiff imageCompare = new ImageDiff(file1,file2);
-		ImageDiffMap imageDiffMap = new ImageDiffMap(imageCompare.getImage1(),imageCompare.getImage2(),Color.BLACK);
+		ImageDiffMap imageDiffMap = new ImageDiffMap(
+				imageCompare.getImage1(),
+				imageCompare.getImage2(),
+				Color.BLACK,
+				14);
 		imageDiffMap.analyze();
 		
 		if(imageDiffMap.getDiffImage()!=null)
 		{
+			BufferedImage anotatedImage = imageDiffMap.getAnnotatedBufferedImage(
+					imageDiffMap.getImage1(),
+					new BasicStroke(2.0f),
+					Color.white);
 			File annotatedBufferedImageFile = new File(file3);	
 			System.out.println("writing to : "+file3);
 		    ImageIO.write(imageCompare.overlayImage(
 		    		imageCompare.getImage2(),
-		    		imageDiffMap.getDiffImage()),
+		    		//imageDiffMap.getDiffImage()
+		    		anotatedImage
+		    		),
 		    		"png", annotatedBufferedImageFile);
 		    System.out.println("wrote : "+file3);
 		}
@@ -113,8 +123,8 @@ public class ImageDiff
 	
 	
 	public BufferedImage getScaledImage(BufferedImage toScale,double scaleFactor) {
-		int width = new Double(toScale.getWidth()*scaleFactor).intValue();
-		int height = new Double(toScale.getHeight()*scaleFactor).intValue();
+		int width = Double.valueOf(toScale.getWidth()*scaleFactor).intValue();
+		int height = Double.valueOf(toScale.getHeight()*scaleFactor).intValue();
 		Image scaledImage = toScale.getScaledInstance(
 				width,
 				height,
@@ -188,23 +198,16 @@ public class ImageDiff
 		int width2 = getImage2().getWidth();
 		int height1 = getImage1().getHeight();
 		int height2 = getImage2().getHeight();
-		int totalPixles = width1*height1;
-		int lastPercent = 0;
 		
 		List<ImageCompare> imageCompareList = new ArrayList<ImageCompare>(); 
 		imageCompareList.add(new ImageCompare(getImage1(),getImage2(),1.0));
 		
 		if((width1 == width2) && (height1 == height2))
 		{
-			int w = width1;
-			int h = width1;
 			double scaleFactor = 0.5;
-			
 			ImageCompare imageCompare = imageCompareList.get(imageCompareList.size()-1);
 
-			
-			while(
-					(imageCompare.getImage1().getWidth()*scaleFactor) >=1 && 
+			while(	(imageCompare.getImage1().getWidth()*scaleFactor) >=1 && 
 					(imageCompare.getImage1().getHeight()*scaleFactor) >=1)  {
 				
 				imageCompare = imageCompareList.get(imageCompareList.size()-1);
@@ -225,8 +228,6 @@ public class ImageDiff
 		}
 		
 		Collections.reverse(imageCompareList);
-		
-		ImageCompare bestImageCompare;
 		
 		for(ImageCompare imageCompare:imageCompareList) {
 			imageCompare.analyze();
@@ -332,9 +333,10 @@ public class ImageDiff
 		BufferedImage annotatedBufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
 		Graphics g = annotatedBufferedImage.getGraphics();
 		Graphics2D g2d = (Graphics2D)g;
-		;
-		g.drawImage(bufferedImage, 0, 0, null);
+		
+		g2d.drawImage(bufferedImage, 0, 0, null);
 
+		
 		// new BasicStroke(5) Color.BLUE
 		/*
 		for(CompareResultArea compareResultArea:this.getCompareResultAreaList())

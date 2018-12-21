@@ -92,20 +92,6 @@ public class ImageCompare {
 							getImage1().getRGB(x, y), 
 							getImage2().getRGB(x, y)
 							);
-					/*
-					while(pixelCompare.getTotalDiff()!=0 && getColorScaleFactor()>0.1)
-					{
-						setColorScaleFactor( getColorScaleFactor()/2.0);
-						
-						pixelCompare = new PixelCompare(
-								new Point2D.Double((double)x, (double)y), 
-								getImage1().getRGB(x, y), 
-								getImage2().getRGB(x, y)
-								);
-						System.out.println("----- x="+x+":y="+y+" ----------------------------");
-						System.out.println("pixelCompare:"+pixelCompare.getInfoString());
-					}
-					*/
 					if(pixelCompare.getTotalDiff()!=0) {
 						System.out.println("----- FINAL x="+x+":y="+y+" ----------------------------");
 						System.out.println("pixelCompare:"+pixelCompare.getInfoString());

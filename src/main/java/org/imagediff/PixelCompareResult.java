@@ -12,37 +12,40 @@ public class PixelCompareResult  {
 	double meadianScale;
 	private double meanScale;
 	private ArrayList<Double> percentileList;
+	private ArrayList<Integer> percentileImageIndexList;
+
 	
-	public PixelCompareResult(double cutoffPercent) {
-		this(cutoffPercent,new ArrayList<PixelCompare>());
+	public PixelCompareResult() {
+		this(new ArrayList<PixelCompare>());
 	}
 
-	public PixelCompareResult(double cutoffPercent,List<PixelCompare> pixelCompareList) {
+	public PixelCompareResult(List<PixelCompare> pixelCompareList) {
 		this.pixelCompareList = pixelCompareList;
 		this.setPercentileList(new ArrayList<Double>());
+		this.setPercentileImageIndexList(new ArrayList<Integer>());
 		refreshStats();
 	}
 
-	public PixelCompareResult getNewPixelCompareResultCutoffAboveInclusive(double cutoff,double cutoffPercent) {
-		PixelCompareResult pixelCompareResult = new PixelCompareResult(cutoffPercent);
-		for(PixelCompare pc:getPixelCompareList()) 
-			if(pc.getColorDistanceScale()>=cutoff)
-				pixelCompareResult.addPixelCompare(pc);
-		return(pixelCompareResult);
-	}
-	
-	public PixelCompareResult getNewPixelCompareResultCutoffBelowInclusive(double cutoff,double cutoffPercent) {
-		PixelCompareResult pixelCompareResult = new PixelCompareResult(cutoffPercent);
-		for(PixelCompare pc:getPixelCompareList()) 
-			if(pc.getColorDistanceScale()<=cutoff)
-				pixelCompareResult.addPixelCompare(pc);
-		return(pixelCompareResult);
+	public List<PixelCompare> getPixelCompareList(int lowerPercentile, int upperPercentile) {
+		List<PixelCompare> pixelCompareList = new ArrayList<PixelCompare>();
+		
+		int startIndex = this.getPercentileImageIndex(lowerPercentile);
+		int endIndex = this.getPercentileImageIndex(upperPercentile);
+		
+		for(int i=startIndex;i<endIndex;i++) {
+			PixelCompare pc = getPixelCompareList().get(i);
+			if(pc.getColorDistanceScale()>getPercentile(lowerPercentile) &&
+					pc.getColorDistanceScale()<=getPercentile(upperPercentile))
+				pixelCompareList.add(pc);
+		}
+		return(pixelCompareList);
 	}
 	
 	public void refreshStats() {
 		if(getPixelCompareList().isEmpty()) return;
 		
 		getPercentileList().clear();
+		getPercentileImageIndexList().clear();
 		double maxColorDistance = 0.0;
 		double maxScale = 0.0;
 		double totalScale = 0.0;		
@@ -62,7 +65,7 @@ public class PixelCompareResult  {
 		int percentile = 0;
 		double percentileTotalCutoff = 0.0;
 		double lastPercentile = 0.0;
-
+		int index = 0;
 		Collections.sort(getPixelCompareList());
 		
 		for(PixelCompare pc:getPixelCompareList())  {
@@ -70,11 +73,13 @@ public class PixelCompareResult  {
 			if(totalScale>=percentileTotalCutoff) {
 				lastPercentile = pc.getColorDistanceScale();
 				getPercentileList().add(lastPercentile);
+				getPercentileImageIndexList().add(index);
 				percentile++;
 				percentileTotalCutoff = getTotalScale()*(percentile/100.0);
 			}
+			index++;
 		}
-		for(;percentile<100;percentile++) getPercentileList().add(lastPercentile);
+		//for(;percentile<100;percentile++) getPercentileList().add(lastPercentile);
 		
 		this.setMaxColorDistance(maxColorDistance);
 		this.setMaxScale(maxScale);
@@ -111,7 +116,15 @@ public class PixelCompareResult  {
 	}
 	
 	public double getPercentile(int percentile) {
-		return( this.getPercentileList().get(percentile) );
+		if(percentile < 0) percentile = 0;
+		else if(percentile >= (getPercentileList().size()) ) percentile = getPercentileList().size()-1;
+		return( getPercentileList().get(percentile) );
+	}
+	
+	public int getPercentileImageIndex(int percentile) {
+		if(percentile < 0) percentile = 0;
+		else if(percentile >= (getPercentileList().size()) ) percentile = getPercentileList().size()-1;
+		return( getPercentileImageIndexList().get(percentile) );
 	}
 	
 	public void addPixelCompare(PixelCompare pixelCompare) {
@@ -172,5 +185,13 @@ public class PixelCompareResult  {
 
 	public void setPercentileList(ArrayList<Double> percentileList) {
 		this.percentileList = percentileList;
+	}
+
+	public ArrayList<Integer> getPercentileImageIndexList() {
+		return percentileImageIndexList;
+	}
+
+	public void setPercentileImageIndexList(ArrayList<Integer> percentileImageIndexList) {
+		this.percentileImageIndexList = percentileImageIndexList;
 	}
 }

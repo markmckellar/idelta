@@ -1,8 +1,13 @@
 package org.imagediff;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -16,13 +21,15 @@ public class ImageDiffMap {
 	private BufferedImage diffImage;
 	private Color diffColor;
 	private PixelCompareResult pixelCompareResult;
+	private ImageDiffArea imageDiffArea;
 	
-	public ImageDiffMap(BufferedImage image1, BufferedImage image2,Color diffColor) {
+	public ImageDiffMap(BufferedImage image1, BufferedImage image2,Color diffColor,int margin) {
 		super();
 		this.image1 = image1;
 		this.image2 = image2;
 		this.setDiffImage(null);
 		this.setDiffColor(diffColor);
+		this.setImageDiffArea(new ImageDiffArea(margin));
 		resetData();
 	}
 	
@@ -32,13 +39,12 @@ public class ImageDiffMap {
 				":width2="+getImage2().getWidth()+
 				":height2="+getImage2().getHeight()+
 				":colorSpace.numComponents="+getImage1().getColorModel().getColorSpace().getNumComponents()+
-				":colorSpace.pixelSize="+getImage1().getColorModel().getPixelSize()
-
-				);
+				":colorSpace.pixelSize="+getImage1().getColorModel().getPixelSize() );
 	}
 		
 	public void resetData() {
-		this.setPixelCompareResult(new PixelCompareResult(0.95));
+		this.setPixelCompareResult(new PixelCompareResult());
+		this.getImageDiffArea().clearImageDiffArea();
 	}
 	
 	public BufferedImage getScaledImage(BufferedImage toScale,double scaleFactor) {
@@ -56,6 +62,34 @@ public class ImageDiffMap {
 		return(bufferedImage);
 	}
 
+	public BufferedImage getAnnotatedBufferedImage(BufferedImage bufferedImage, Stroke stroke, Color color) throws Exception
+	{
+		BufferedImage annotatedBufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
+		Graphics g = annotatedBufferedImage.getGraphics();
+		Graphics2D g2d = (Graphics2D)g;
+		
+		g2d.drawImage(bufferedImage, 0, 0, null);
+
+		System.out.println("ImageDiffMap:getAnnotatedBufferedImage:getImageDiffArea().getPixelCompareAreaList().size()="+
+				getImageDiffArea().getPixelCompareAreaList().size());
+		for(PixelCompareArea pca:getImageDiffArea().getPixelCompareAreaList()) {
+			Area area = new Area();
+			System.out.println("ImageDiffMap:getAnnotatedBufferedImage:pca.getPixelAreas().size()="+
+					pca.getPixelAreas().size());
+			for(Shape shape:pca.getPixelAreas()) area.add(new Area(shape));
+			
+			//Stroke stroke = new BasicStroke(5);
+		
+			g2d.setPaint(ImageCompare.getColorFromString("ff00000f"));
+			g2d.fill(area);
+			
+			g2d.setPaint(color);
+			g2d.setStroke(stroke);
+			g2d.draw(area);
+		}
+		g2d.dispose();
+		return(annotatedBufferedImage);
+	}
 	
 	public void analyze() throws Exception
 	{
@@ -84,45 +118,30 @@ public class ImageDiffMap {
 			getPixelCompareResult().quickGraph(95);
 		
 			PixelCompareResult pcr = getPixelCompareResult();
-				
-			for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(40),Color.pink);	
-				
-				
-			for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(50),Color.WHITE);	
-			
-			for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(65),Color.YELLOW);
-			
-			for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(85),Color.GREEN);			
-			
-			for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(90),Color.BLUE);			
-	
-			for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(95),Color.MAGENTA);			
+			ImageDiffArea ida = this.getImageDiffArea();
+			ida.addPixeCompareList(pcr.getPixelCompareList(95,100), true);
+			ida.addPixeCompareList(pcr.getPixelCompareList(90,95), true);
+			ida.addPixeCompareList(pcr.getPixelCompareList(85,90), true);
+			ida.addPixeCompareList(pcr.getPixelCompareList(80,85), true);
+			ida.removeSmallPixelCompareAreas(10);
 
-		
-			/*
-			for(int x = 0;x < width1;x++)
-			{
-				for(int y = 0;y < height1;y++)
-				{
-					PixelCompare pixelCompare = new PixelCompare(
-							new Point2D.Double((double)x, (double)y), 
-							getImage1().getRGB(x, y), 
-							getImage2().getRGB(x, y)
-							);	
-					double colorDistance = pixelCompare.getColorDistance();
-					if(maxColorDistance<colorDistance) maxColorDistance = colorDistance;
-					double scale = Math.pow(colorDistance/65536.0,0.5);
-					totalScale += scale;
-					if(maxScale<scale) maxScale = scale;
-					diffImage.setRGB(x, y,getDiffColorScale(scale).getRGB());
-				}
-			}
-*/
+			//ida.addPixeCompareList(pcr.getPixelCompareList(75,80), false);
+			//ida.addPixeCompareList(pcr.getPixelCompareList(70,75), false);
+			//ida.addPixeCompareList(pcr.getPixelCompareList(30,70), false);
+
+			//ida.removeSmallPixelCompareAreas(10);
+
+			//System.out.println("1:"+ida.getInfoString());
+			//System.out.println("2:"+ida.getInfoString());
+			//ida.addPixeCompareList(pcr.getPixelCompareList(70,85), false);
+			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(40),Color.pink);	
+			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(50),Color.WHITE);	
+			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(65),Color.YELLOW);
+			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(85),Color.GREEN);			
+			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(90),Color.BLUE);			
+			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(95),Color.MAGENTA);			
 		}
-		//bGr.dispose();
 		this.setDiffImage(diffImage);
-
-		
 	}
 		
 	public BufferedImage getImage1() {
@@ -162,5 +181,11 @@ public class ImageDiffMap {
 		this.pixelCompareResult = pixelCompareResult;
 	}
 
-	
+	public ImageDiffArea getImageDiffArea() {
+		return imageDiffArea;
+	}
+
+	public void setImageDiffArea(ImageDiffArea imageDiffArea) {
+		this.imageDiffArea = imageDiffArea;
+	}
 }
