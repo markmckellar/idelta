@@ -1,10 +1,5 @@
 package org.imagediff;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +39,7 @@ public class ImageDiffArea {
 
 	public void addPixeCompareList(List<PixelCompare> pixelCompareList,boolean alwaysAdd) {
 		List<PixelCompareArea> matchingPcaList = new ArrayList<PixelCompareArea>();
-		System.out.println("ImageDiffArea:addPixelCompareList:size="+pixelCompareList.size());
+		//System.out.println("ImageDiffArea:addPixelCompareList:size="+pixelCompareList.size());
 		for(PixelCompare pc:pixelCompareList)
 		{
 			matchingPcaList.clear();

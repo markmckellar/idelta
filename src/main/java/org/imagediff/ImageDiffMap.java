@@ -1,6 +1,5 @@
 package org.imagediff;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -10,17 +9,14 @@ import java.awt.Stroke;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.idelta.CompareResultPixel;
 
 public class ImageDiffMap {
-	private BufferedImage image1;
-	private BufferedImage image2;
-	private BufferedImage diffImage;
-	private Color diffColor;
-	private PixelCompareResult pixelCompareResult;
+	transient private BufferedImage image1;
+	transient private BufferedImage image2;
+	transient private BufferedImage diffImage;
+	transient private Color diffColor;
+	transient private PixelCompareResult pixelCompareResult;
 	private ImageDiffArea imageDiffArea;
 	
 	public ImageDiffMap(BufferedImage image1, BufferedImage image2,Color diffColor,int margin) {
@@ -61,6 +57,31 @@ public class ImageDiffMap {
 	    bGr.dispose();
 		return(bufferedImage);
 	}
+	
+	public static Color getColorFromString(String colorString) throws Exception
+    {
+    	float transparency = 1.0f;
+    	if(colorString.length()==6)
+    	{
+    		// do nothing
+    	}
+    	else if(colorString.length()==8)
+    	{
+    		String transparencyString = colorString.substring(6);
+    		float transparencyNumerator = Integer.parseInt(transparencyString, 16);
+    		transparency = transparencyNumerator/255.0f;
+    		colorString = colorString.substring(0,6);
+    	}
+    	else throw new Exception("color param must be 6 or 8 characters in length:"+colorString+" is "+colorString.length());
+    	
+    	Color color = Color.decode("0x"+colorString);
+    
+    	color = new Color(
+    			(float)color.getRed()/255f,
+    			(float)color.getGreen()/255f,
+    			(float)color.getBlue()/255f,transparency);
+    	return(color);
+    }
 
 	public BufferedImage getAnnotatedBufferedImage(BufferedImage bufferedImage, Stroke stroke, Color color) throws Exception
 	{
@@ -70,22 +91,25 @@ public class ImageDiffMap {
 		
 		g2d.drawImage(bufferedImage, 0, 0, null);
 
-		System.out.println("ImageDiffMap:getAnnotatedBufferedImage:getImageDiffArea().getPixelCompareAreaList().size()="+
-				getImageDiffArea().getPixelCompareAreaList().size());
+		//System.out.println("ImageDiffMap:getAnnotatedBufferedImage:getImageDiffArea().getPixelCompareAreaList().size()="+
+		//		getImageDiffArea().getPixelCompareAreaList().size());
 		for(PixelCompareArea pca:getImageDiffArea().getPixelCompareAreaList()) {
 			Area area = new Area();
-			System.out.println("ImageDiffMap:getAnnotatedBufferedImage:pca.getPixelAreas().size()="+
-					pca.getPixelAreas().size());
+			//System.out.println("ImageDiffMap:getAnnotatedBufferedImage:pca.getPixelAreas().size()="+
+			//		pca.getPixelAreas().size());
 			for(Shape shape:pca.getPixelAreas()) area.add(new Area(shape));
 			
 			//Stroke stroke = new BasicStroke(5);
 		
-			g2d.setPaint(ImageCompare.getColorFromString("ff00000f"));
-			g2d.fill(area);
-			
-			g2d.setPaint(color);
-			g2d.setStroke(stroke);
-			g2d.draw(area);
+			Shape bounds = area.getBounds();
+			//bounds = area;
+			{
+				g2d.setPaint(getColorFromString("ff00000f"));
+				g2d.fill(bounds);	
+				g2d.setPaint(color);
+				g2d.setStroke(stroke);
+				g2d.draw(bounds);
+			}	
 		}
 		g2d.dispose();
 		return(annotatedBufferedImage);
@@ -115,15 +139,16 @@ public class ImageDiffMap {
 				}
 			}
 			getPixelCompareResult().refreshStats();
-			getPixelCompareResult().quickGraph(95);
 		
 			PixelCompareResult pcr = getPixelCompareResult();
+			getPixelCompareResult().printQuickGraph(95);
+
 			ImageDiffArea ida = this.getImageDiffArea();
 			ida.addPixeCompareList(pcr.getPixelCompareList(95,100), true);
 			ida.addPixeCompareList(pcr.getPixelCompareList(90,95), true);
 			ida.addPixeCompareList(pcr.getPixelCompareList(85,90), true);
 			ida.addPixeCompareList(pcr.getPixelCompareList(80,85), true);
-			ida.removeSmallPixelCompareAreas(10);
+			ida.removeSmallPixelCompareAreas(100);
 
 			//ida.addPixeCompareList(pcr.getPixelCompareList(75,80), false);
 			//ida.addPixeCompareList(pcr.getPixelCompareList(70,75), false);
@@ -188,4 +213,7 @@ public class ImageDiffMap {
 	public void setImageDiffArea(ImageDiffArea imageDiffArea) {
 		this.imageDiffArea = imageDiffArea;
 	}
+
+
+
 }

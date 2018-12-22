@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class PixelCompareResult  {
-	private List<PixelCompare> pixelCompareList;
+	transient private List<PixelCompare> pixelCompareList;
 	double maxColorDistance;
 	double maxScale;
 	double totalScale;
@@ -13,7 +13,11 @@ public class PixelCompareResult  {
 	private double meanScale;
 	private ArrayList<Double> percentileList;
 	private ArrayList<Integer> percentileImageIndexList;
-
+	private ImageDiffMapGraph colorDiffGraph;
+	private int totalPixels;
+	private int pixlesDifferent;
+	private int pixlesEqual;
+	private double diffrentPercent;
 	
 	public PixelCompareResult() {
 		this(new ArrayList<PixelCompare>());
@@ -67,9 +71,11 @@ public class PixelCompareResult  {
 		double lastPercentile = 0.0;
 		int index = 0;
 		Collections.sort(getPixelCompareList());
+		int diffTotal = 0;
 		
 		for(PixelCompare pc:getPixelCompareList())  {
 			totalScale += pc.getColorDistanceScale();
+			if(pc.getColorDistance()!=0.0) diffTotal++;
 			if(totalScale>=percentileTotalCutoff) {
 				lastPercentile = pc.getColorDistanceScale();
 				getPercentileList().add(lastPercentile);
@@ -81,38 +87,35 @@ public class PixelCompareResult  {
 		}
 		//for(;percentile<100;percentile++) getPercentileList().add(lastPercentile);
 		
+		setColorDiffGraph(new ImageDiffMapGraph(this,150));
+
 		this.setMaxColorDistance(maxColorDistance);
 		this.setMaxScale(maxScale);
 		this.setMeadianScale(meadian);
 		this.setMeanScale( this.getTotalScale()/getPixelCompareList().size() );
+		
+		this.setTotalPixels(getPixelCompareList().size());
+		this.setPixlesDifferent(diffTotal);
+		this.setPixlesEqual(getPixelCompareList().size()-diffTotal);
+		this.setDiffrentPercent(diffTotal/(getPixelCompareList().size()*1.0));
 	}
 	
-	public  void quickGraph(int percentile) {
+	public  void printQuickGraph(int percentile) {
 		refreshStats();
 		
-		int[] graph = new int[100];
-		for(int i=0;i<graph.length;i++) graph[i] = 0;
-		for(PixelCompare pc:getPixelCompareList())  {
-			graph[Double.valueOf(Math.round(pc.getColorDistanceScale()*100)).intValue()]++;
-			}
-		
-		int max = 0;
-		for(int i=0;i<graph.length;i++) if(graph[i]>max) max = graph[i];
-		for(int i=0;i<graph.length;i++) 
-		{
-			System.out.printf("%3d:",i);
-			int length = (graph[i]*150)/max;
-			for(int m=0;m<length;m++) System.out.print("*");
-			System.out.print("\n");
-		}
-		
+		for(int i=0;i<getColorDiffGraph().getPercentileGraph().size();i++) 
+			System.out.printf("%3d:%s\n",i,getColorDiffGraph().getPercentileGraph().get(i));
 		System.out.println("maxColorDistance="+getMaxColorDistance());
 		System.out.println("maxScale="+getMaxScale());
 		System.out.println("meanScale="+getMeanScale());
 		System.out.println("meadianScale="+getMeadianScale());
-		System.out.println("mean/meadian="+(getMeanScale()/getMeadianScale()));
 		System.out.println("cutoffPercent="+percentile);
 		System.out.println("cutoffPercentValue="+getPercentile(percentile));
+		System.out.println("totalPixels="+getTotalPixels());
+		System.out.println("pixlesDifferent="+getPixlesDifferent());
+		System.out.println("pixlesEqual="+getPixlesEqual());
+		System.out.println("diffrentPercent="+getDiffrentPercent());
+
 	}
 	
 	public double getPercentile(int percentile) {
@@ -193,5 +196,45 @@ public class PixelCompareResult  {
 
 	public void setPercentileImageIndexList(ArrayList<Integer> percentileImageIndexList) {
 		this.percentileImageIndexList = percentileImageIndexList;
+	}
+
+	public ImageDiffMapGraph getColorDiffGraph() {
+		return colorDiffGraph;
+	}
+
+	public void setColorDiffGraph(ImageDiffMapGraph colorDiffGraph) {
+		this.colorDiffGraph = colorDiffGraph;
+	}
+	
+	public int getTotalPixels() {
+		return totalPixels;
+	}
+
+	public void setTotalPixels(int totalPixels) {
+		this.totalPixels = totalPixels;
+	}
+
+	public int getPixlesDifferent() {
+		return pixlesDifferent;
+	}
+
+	public void setPixlesDifferent(int pixlesDifferent) {
+		this.pixlesDifferent = pixlesDifferent;
+	}
+
+	public int getPixlesEqual() {
+		return pixlesEqual;
+	}
+
+	public void setPixlesEqual(int pixlesEqual) {
+		this.pixlesEqual = pixlesEqual;
+	}
+
+	public double getDiffrentPercent() {
+		return diffrentPercent;
+	}
+
+	public void setDiffrentPercent(double diffrentPercent) {
+		this.diffrentPercent = diffrentPercent;
 	}
 }
