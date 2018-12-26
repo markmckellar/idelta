@@ -1,14 +1,15 @@
 package org.imagediff;
 
 import java.awt.Shape;
+import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PixelCompareArea {
-	private List<PixelCompare> pixelCompareList;
-	private List<Shape> pixelAreas;
-	
+	transient private List<PixelCompare> pixelCompareList;
+	transient private List<Shape> pixelAreas;
+	private Shape boundingBox;
 	public PixelCompareArea() {
 		this.pixelCompareList = new ArrayList<PixelCompare>();
 		this.setPixelAreas(new ArrayList<Shape>());
@@ -19,6 +20,12 @@ public class PixelCompareArea {
 		this.addPixelCompare(pixelCompare,margin);
 	}
 
+	public void fillBoundingBox() {
+			Area area = new Area();
+			for(Shape shape:getPixelAreas()) area.add(new Area(shape));
+			Shape bounds = area.getBounds();
+			this.setBoundingBox(bounds);
+	}
 
 	public void clearPixelCompareArea() {
 		this.getPixelCompareList().clear();
@@ -69,6 +76,14 @@ public class PixelCompareArea {
 		// TODO Auto-generated method stub
 		return("PixelCompareArea:pixelAreas.size="+this.getPixelAreas().size()+
 				":pixelCompareList.size="+this.getPixelCompareList().size());
+	}
+
+	public Shape getBoundingBox() {
+		return boundingBox;
+	}
+
+	public void setBoundingBox(Shape boundingBox) {
+		this.boundingBox = boundingBox;
 	}
 }
 

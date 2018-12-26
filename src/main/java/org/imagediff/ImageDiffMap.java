@@ -16,7 +16,7 @@ public class ImageDiffMap {
 	transient private BufferedImage image2;
 	transient private BufferedImage diffImage;
 	transient private Color diffColor;
-	transient private PixelCompareResult pixelCompareResult;
+	private PixelCompareResult pixelCompareResult;
 	private ImageDiffArea imageDiffArea;
 	
 	public ImageDiffMap(BufferedImage image1, BufferedImage image2,Color diffColor,int margin) {
@@ -141,7 +141,7 @@ public class ImageDiffMap {
 			getPixelCompareResult().refreshStats();
 		
 			PixelCompareResult pcr = getPixelCompareResult();
-			getPixelCompareResult().printQuickGraph(95);
+			//getPixelCompareResult().printQuickGraph(95);
 
 			ImageDiffArea ida = this.getImageDiffArea();
 			ida.addPixeCompareList(pcr.getPixelCompareList(95,100), true);
@@ -166,6 +166,10 @@ public class ImageDiffMap {
 			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(90),Color.BLUE);			
 			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(95),Color.MAGENTA);			
 		}
+		
+		for(PixelCompareArea pca:getImageDiffArea().getPixelCompareAreaList()) 
+			pca.fillBoundingBox();
+			
 		this.setDiffImage(diffImage);
 	}
 		

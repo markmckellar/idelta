@@ -18,6 +18,11 @@ public class PixelCompareResult  {
 	private int pixlesDifferent;
 	private int pixlesEqual;
 	private double diffrentPercent;
+	private double meanMedianRatio;
+	private int meanPosition;
+	private double meanPositionPercent;
+	private double meanMeadianPositionRation;
+	private double standardDeviation;
 	
 	public PixelCompareResult() {
 		this(new ArrayList<PixelCompare>());
@@ -85,19 +90,54 @@ public class PixelCompareResult  {
 			}
 			index++;
 		}
-		//for(;percentile<100;percentile++) getPercentileList().add(lastPercentile);
+				
 		
-		setColorDiffGraph(new ImageDiffMapGraph(this,150));
+		setColorDiffGraph(new ImageDiffMapGraph(this,75));
 
 		this.setMaxColorDistance(maxColorDistance);
 		this.setMaxScale(maxScale);
 		this.setMeadianScale(meadian);
 		this.setMeanScale( this.getTotalScale()/getPixelCompareList().size() );
-		
+		this.setMeanMedianRatio(getMeanScale()/getMeadianScale());
 		this.setTotalPixels(getPixelCompareList().size());
 		this.setPixlesDifferent(diffTotal);
 		this.setPixlesEqual(getPixelCompareList().size()-diffTotal);
 		this.setDiffrentPercent(diffTotal/(getPixelCompareList().size()*1.0));
+		this.setMeanPosition(getPositionOfScale(getMeanScale()));
+		this.setMeanMeadianPositionRation(getMeanPosition()/ (getPixelCompareList().size()/2.0) );
+		this.setMeanPositionPercent(getMeanPosition()/(getPixelCompareList().size()*1.0));
+		
+		//for(;percentile<100;percentile++) getPercentileList().add(lastPercentile);
+		/*
+		 *  To calculate the standard deviation of those numbers:
+			Work out the Mean (the simple average of the numbers)
+			Then for each number: subtract the Mean and square the result.
+			Then work out the mean of those squared differences.
+			Take the square root of that and we are done!
+		 */
+		double totalstandardDeviation = 0.0;
+		for(PixelCompare pc:getPixelCompareList())  {
+			totalstandardDeviation += Math.pow(pc.getColorDistanceScale()-getMeanScale(),2.0);
+		}
+		this.setStandardDeviation(Math.sqrt(totalstandardDeviation/getPixelCompareList().size()));
+		
+	}
+	
+	public int getPositionOfScale(double scale) {
+		int high = getPixelCompareList().size()-1;
+		int low = 0;
+		int guess = getPixelCompareList().size()/2;
+		
+		while(high!=low) {
+			double guessScale = getPixelCompareList().get(guess).getColorDistanceScale();
+			//System.out.println("high="+high+" low="+low+" scale="+scale+" guessScale="+guessScale);
+			if(guessScale==scale) break;
+			else if(guessScale>scale) high = guess;
+			else low = guess;
+			if( (high-low) == 1) high--;
+			guess = (high+low)/2;
+		}
+		return(guess);
 	}
 	
 	public  void printQuickGraph(int percentile) {
@@ -111,10 +151,16 @@ public class PixelCompareResult  {
 		System.out.println("meadianScale="+getMeadianScale());
 		System.out.println("cutoffPercent="+percentile);
 		System.out.println("cutoffPercentValue="+getPercentile(percentile));
+		System.out.println("meanMedianRatio:"+getMeanMedianRatio());
 		System.out.println("totalPixels="+getTotalPixels());
 		System.out.println("pixlesDifferent="+getPixlesDifferent());
 		System.out.println("pixlesEqual="+getPixlesEqual());
 		System.out.println("diffrentPercent="+getDiffrentPercent());
+		System.out.println("meanPosition="+getMeanPosition());
+		System.out.println("meanMeadianPositionRation="+getMeanMeadianPositionRation());
+		System.out.println("meanPositionPercent="+getMeanPositionPercent());
+		System.out.println("standardDeviation="+getStandardDeviation());
+
 
 	}
 	
@@ -236,5 +282,45 @@ public class PixelCompareResult  {
 
 	public void setDiffrentPercent(double diffrentPercent) {
 		this.diffrentPercent = diffrentPercent;
+	}
+
+	public double getMeanMedianRatio() {
+		return meanMedianRatio;
+	}
+
+	public void setMeanMedianRatio(double meanMedianRatio) {
+		this.meanMedianRatio = meanMedianRatio;
+	}
+
+	public int getMeanPosition() {
+		return meanPosition;
+	}
+
+	public void setMeanPosition(int meanPosition) {
+		this.meanPosition = meanPosition;
+	}
+
+	public double getMeanMeadianPositionRation() {
+		return meanMeadianPositionRation;
+	}
+
+	public void setMeanMeadianPositionRation(double meanMeadianPositionRation) {
+		this.meanMeadianPositionRation = meanMeadianPositionRation;
+	}
+
+	public double getMeanPositionPercent() {
+		return meanPositionPercent;
+	}
+
+	public void setMeanPositionPercent(double meanPositionPercent) {
+		this.meanPositionPercent = meanPositionPercent;
+	}
+
+	public double getStandardDeviation() {
+		return standardDeviation;
+	}
+
+	public void setStandardDeviation(double standardDeviation) {
+		this.standardDeviation = standardDeviation;
 	}
 }

@@ -1,0 +1,7 @@
+{
+  "inFile1": "/home/mdm/dev/workspaces/java_workspace/idelta/test_files/standing_redCouch.jpg",
+  "inFile2": "/home/mdm/dev/workspaces/java_workspace/idelta/test_files/sitting_redCouch.jpg",
+  "outImageFile": "/home/mdm/temp/test2.png",
+  "outJsonFile": "/home/mdm/temp/test3.png",
+  "compareMargin": 20
+}

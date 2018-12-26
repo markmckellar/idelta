@@ -9,54 +9,36 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javax.imageio.ImageIO;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class ImageDiff
 {
-	private String cmpFile1;
-	private String cmpFile2;
 	private ImageDiffMap imageDiffMap;
+	private ImageDiffConfig imageDiffConfig;
 	
 	public static void main(String args[]) throws Exception {
-		if(args.length!=3) throw new Exception("Expected 3 aruments, got "+
+		
+		/*if(args.length!=3) throw new Exception("Expected 3 aruments, got "+
 				args.length+
 				": file1 file2 diffFile margin colorDiffCutoff");
-		String file1 = args[0];
-		String file2 = args[1];
-		String file3 = args[2];
-		
-		/*
-    	Gson gson = new Gson();
-		Type objectType = new TypeToken<String[]>() {}.getType();
-		String json = gson.toJson(args,objectType);
-		System.out.println("args="+json);
 		*/
-		ImageDiff imageDiff = new ImageDiff(file1,file2);
-		
-		imageDiff.getImageDiffMap().analyze();
-		
-		if(imageDiff.getImageDiffMap().getDiffImage()!=null)
+		System.out.println("ImageDiff:passed "+args.length+" config files");
+		for(int i=0;i<args.length;i++)
 		{
-			BufferedImage anotatedImage = imageDiff.getImageDiffMap().getAnnotatedBufferedImage(
-					imageDiff.getImageDiffMap().getImage1(),
-					new BasicStroke(2.0f),
-					Color.white);
-			File annotatedBufferedImageFile = new File(file3);	
-			//System.out.println("writing to : "+file3);
-		   ImageIO.write(imageDiff.overlayImage(
-		    		imageDiff.getImageDiffMap().getImage2(),
-		    		//imageDiffMap.getDiffImage()
-		    		anotatedImage
-		    		),
-		    		"png", annotatedBufferedImageFile);
-		   // System.out.println("wrote : "+file3);
-		}
-		else
-		{
-			//System.out.println("getDiffImage was null!!");
-
+		
+			String configFile = args[i];
+			System.out.println("* opening config file : "+configFile);
+			
+			ImageDiff imageDiff = new ImageDiff(ImageDiffConfig.imageDiffConfigFromFile(configFile));
+			
+			imageDiff.analyze();
+			imageDiff.output();
 		}
 	}
 	
@@ -68,17 +50,35 @@ public class ImageDiff
 	 * @param ingoreAreaList
 	 * @throws Exception
 	 */
-	public ImageDiff(String cmpFile1, String cmpFile2) throws Exception
+	public ImageDiff(ImageDiffConfig imageDiffConfig) throws Exception
 	{
-		setCmpFile1(cmpFile1);
-		setCmpFile2(cmpFile2);
-		BufferedImage img1 = ImageIO.read( new File(cmpFile1));
-		BufferedImage img2 = ImageIO.read( new File(cmpFile2));
+		this.setImageDiffConfig(imageDiffConfig);
+		this.setImageDiffMap(imageDiffMap);
+		BufferedImage img1 = ImageIO.read( new File(imageDiffConfig.getInFile1()));
+		BufferedImage img2 = ImageIO.read( new File(imageDiffConfig.getInFile2()));
 		setImageDiffMap(new ImageDiffMap(
 				img1,img2,
 				Color.BLACK,
 				14) );
 	
+	}
+	
+	public String toJson() {
+		Gson gson = new Gson();
+		Type objectType = new TypeToken<ImageDiff>() {}.getType();
+		String json = gson.toJson(this,objectType);
+		return(json);
+	}
+	
+	public void analyze() throws Exception {
+		System.out.println("* analyzing");
+		getImageDiffMap().analyze();
+	}
+	
+	public void output() throws Exception {
+		System.out.println("* outputting");
+		writeOutImageFile();
+		writeOutJsonFile();
 	}
 	
 	public BufferedImage getScaledImage(BufferedImage toScale,double scaleFactor) {
@@ -118,6 +118,33 @@ public class ImageDiff
 		return(resizedBufferedImage);
 	}
 	
+	public void writeOutJsonFile() throws Exception {
+		if(!imageDiffConfig.getOutJsonFile().isEmpty()) {
+			Path path = Paths.get(getImageDiffConfig().getOutJsonFile());
+			Files.write(path, toJson().getBytes());
+			Files.readAllBytes( path );
+		}
+	}
+	
+	
+	public void writeOutImageFile() throws Exception {
+		if(getImageDiffMap().getDiffImage()!=null && !getImageDiffConfig().getOutImageFile().isEmpty())
+		{
+			BufferedImage anotatedImage = getImageDiffMap().getAnnotatedBufferedImage(
+					getImageDiffMap().getImage1(),
+					new BasicStroke(2.0f),
+					Color.white);
+		
+			File annotatedBufferedImageFile = new File(getImageDiffConfig().getOutImageFile());	
+			ImageIO.write(overlayImage(
+		    		getImageDiffMap().getImage2(),
+		    		//imageDiffMap.getDiffImage()
+		    		anotatedImage
+		    		),
+		    		"png", annotatedBufferedImageFile);
+		}
+	}
+	
 	public ImageDiffMap getImageDiffMap() {
 		return imageDiffMap;
 	}
@@ -126,20 +153,12 @@ public class ImageDiff
 		this.imageDiffMap = imageDiffMap;
 	}
 
-	public String getCmpFile1() {
-		return cmpFile1;
+	public ImageDiffConfig getImageDiffConfig() {
+		return imageDiffConfig;
 	}
 
-	public void setCmpFile1(String cmpFile1) {
-		this.cmpFile1 = cmpFile1;
-	}
-
-	public String getCmpFile2() {
-		return cmpFile2;
-	}
-
-	public void setCmpFile2(String cmpFile2) {
-		this.cmpFile2 = cmpFile2;
+	public void setImageDiffConfig(ImageDiffConfig imageDiffConfig) {
+		this.imageDiffConfig = imageDiffConfig;
 	}
 
 }
