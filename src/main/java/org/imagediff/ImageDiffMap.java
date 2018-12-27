@@ -142,29 +142,13 @@ public class ImageDiffMap {
 		
 			PixelCompareResult pcr = getPixelCompareResult();
 			//getPixelCompareResult().printQuickGraph(95);
-
+			pcr.refreshStats();
 			ImageDiffArea ida = this.getImageDiffArea();
 			ida.addPixeCompareList(pcr.getPixelCompareList(95,100), true);
 			ida.addPixeCompareList(pcr.getPixelCompareList(90,95), true);
 			ida.addPixeCompareList(pcr.getPixelCompareList(85,90), true);
 			ida.addPixeCompareList(pcr.getPixelCompareList(80,85), true);
 			ida.removeSmallPixelCompareAreas(100);
-
-			//ida.addPixeCompareList(pcr.getPixelCompareList(75,80), false);
-			//ida.addPixeCompareList(pcr.getPixelCompareList(70,75), false);
-			//ida.addPixeCompareList(pcr.getPixelCompareList(30,70), false);
-
-			//ida.removeSmallPixelCompareAreas(10);
-
-			//System.out.println("1:"+ida.getInfoString());
-			//System.out.println("2:"+ida.getInfoString());
-			//ida.addPixeCompareList(pcr.getPixelCompareList(70,85), false);
-			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(40),Color.pink);	
-			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(50),Color.WHITE);	
-			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(65),Color.YELLOW);
-			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(85),Color.GREEN);			
-			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(90),Color.BLUE);			
-			//for(PixelCompare pc:pcr.getPixelCompareList()) pc.setBufferedImagePixel(diffImage,pcr.getPercentile(95),Color.MAGENTA);			
 		}
 		
 		for(PixelCompareArea pca:getImageDiffArea().getPixelCompareAreaList()) 

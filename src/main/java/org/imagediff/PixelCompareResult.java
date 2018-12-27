@@ -21,7 +21,7 @@ public class PixelCompareResult  {
 	private double meanMedianRatio;
 	private int meanPosition;
 	private double meanPositionPercent;
-	private double meanMeadianPositionRation;
+	private double meanMeadianPositionRatio;
 	private double standardDeviation;
 	
 	public PixelCompareResult() {
@@ -104,7 +104,7 @@ public class PixelCompareResult  {
 		this.setPixlesEqual(getPixelCompareList().size()-diffTotal);
 		this.setDiffrentPercent(diffTotal/(getPixelCompareList().size()*1.0));
 		this.setMeanPosition(getPositionOfScale(getMeanScale()));
-		this.setMeanMeadianPositionRation(getMeanPosition()/ (getPixelCompareList().size()/2.0) );
+		this.setMeanMeadianPositionRatio(getMeanPosition()/ (getPixelCompareList().size()/2.0) );
 		this.setMeanPositionPercent(getMeanPosition()/(getPixelCompareList().size()*1.0));
 		
 		//for(;percentile<100;percentile++) getPercentileList().add(lastPercentile);
@@ -157,11 +157,9 @@ public class PixelCompareResult  {
 		System.out.println("pixlesEqual="+getPixlesEqual());
 		System.out.println("diffrentPercent="+getDiffrentPercent());
 		System.out.println("meanPosition="+getMeanPosition());
-		System.out.println("meanMeadianPositionRation="+getMeanMeadianPositionRation());
+		System.out.println("meanMeadianPositionRation="+getMeanMeadianPositionRatio());
 		System.out.println("meanPositionPercent="+getMeanPositionPercent());
 		System.out.println("standardDeviation="+getStandardDeviation());
-
-
 	}
 	
 	public double getPercentile(int percentile) {
@@ -300,12 +298,12 @@ public class PixelCompareResult  {
 		this.meanPosition = meanPosition;
 	}
 
-	public double getMeanMeadianPositionRation() {
-		return meanMeadianPositionRation;
+	public double getMeanMeadianPositionRatio() {
+		return meanMeadianPositionRatio;
 	}
 
-	public void setMeanMeadianPositionRation(double meanMeadianPositionRation) {
-		this.meanMeadianPositionRation = meanMeadianPositionRation;
+	public void setMeanMeadianPositionRatio(double meanMeadianPositionRatio) {
+		this.meanMeadianPositionRatio = meanMeadianPositionRatio;
 	}
 
 	public double getMeanPositionPercent() {

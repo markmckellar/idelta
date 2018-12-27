@@ -8,7 +8,7 @@ ext {
     libraryDescription = 'a simple light weight server to simplify service mappings'
     siteUrl = 'https://github.com/markmckellar/imagediff'
     gitUrl = 'https://github.com/markmckellar/imagediffgit'
-    libraryVersion = '20181216.2'
+    libraryVersion = '20181216.3'
     developerId = 'mdm'
     developerName = 'Mark McKellar'
     developerEmail = 'mckellar.mm@gmail.com'

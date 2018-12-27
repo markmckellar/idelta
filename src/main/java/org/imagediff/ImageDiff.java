@@ -59,7 +59,7 @@ public class ImageDiff
 		setImageDiffMap(new ImageDiffMap(
 				img1,img2,
 				Color.BLACK,
-				14) );
+				imageDiffConfig.getCompareMargin()) );
 	
 	}
 	
