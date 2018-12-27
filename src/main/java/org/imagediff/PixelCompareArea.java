@@ -10,6 +10,7 @@ public class PixelCompareArea {
 	transient private List<PixelCompare> pixelCompareList;
 	transient private List<Shape> pixelAreas;
 	private Shape boundingBox;
+	private PixelCompareResult pixelCompareResult;
 	public PixelCompareArea() {
 		this.pixelCompareList = new ArrayList<PixelCompare>();
 		this.setPixelAreas(new ArrayList<Shape>());
@@ -25,7 +26,11 @@ public class PixelCompareArea {
 			for(Shape shape:getPixelAreas()) area.add(new Area(shape));
 			Shape bounds = area.getBounds();
 			this.setBoundingBox(bounds);
+			
+			this.setPixelCompareResult(new PixelCompareResult(getPixelCompareList()));
 	}
+	
+
 
 	public void clearPixelCompareArea() {
 		this.getPixelCompareList().clear();
@@ -84,6 +89,14 @@ public class PixelCompareArea {
 
 	public void setBoundingBox(Shape boundingBox) {
 		this.boundingBox = boundingBox;
+	}
+
+	public PixelCompareResult getPixelCompareResult() {
+		return pixelCompareResult;
+	}
+
+	public void setPixelCompareResult(PixelCompareResult pixelCompareResult) {
+		this.pixelCompareResult = pixelCompareResult;
 	}
 }
 

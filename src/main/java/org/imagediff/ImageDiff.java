@@ -21,6 +21,8 @@ public class ImageDiff
 {
 	private ImageDiffMap imageDiffMap;
 	private ImageDiffConfig imageDiffConfig;
+	private int width;
+	private int height;
 	
 	public static void main(String args[]) throws Exception {
 		
@@ -56,10 +58,19 @@ public class ImageDiff
 		this.setImageDiffMap(imageDiffMap);
 		BufferedImage img1 = ImageIO.read( new File(imageDiffConfig.getInFile1()));
 		BufferedImage img2 = ImageIO.read( new File(imageDiffConfig.getInFile2()));
+		if(getImageDiffConfig().getScaleFactor()!=0.0 &&
+				getImageDiffConfig().getScaleFactor()!=10.0)
+		{
+			img1 = this.getScaledImage(img1, getImageDiffConfig().getScaleFactor());
+			img2 = this.getScaledImage(img2, getImageDiffConfig().getScaleFactor());
+
+		}
 		setImageDiffMap(new ImageDiffMap(
 				img1,img2,
 				Color.BLACK,
 				imageDiffConfig.getCompareMargin()) );
+		this.setWidth(img1.getWidth());
+		this.setHeight(img2.getHeight());
 	
 	}
 	
@@ -159,6 +170,22 @@ public class ImageDiff
 
 	public void setImageDiffConfig(ImageDiffConfig imageDiffConfig) {
 		this.imageDiffConfig = imageDiffConfig;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
 	}
 
 }

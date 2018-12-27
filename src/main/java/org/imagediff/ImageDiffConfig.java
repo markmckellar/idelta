@@ -15,6 +15,7 @@ public class ImageDiffConfig {
 	private String outImageFile = "";
 	private String outJsonFile = "";
 	private int compareMargin = 1;
+	private double scaleFactor;
 	
 	public  static ImageDiffConfig imageDiffConfigFromFile(String imageDiffConfigFile) throws Exception {
 		
@@ -78,6 +79,14 @@ public class ImageDiffConfig {
 
 	public void setInFile2(String inFile2) {
 		this.inFile2 = inFile2;
+	}
+
+	public double getScaleFactor() {
+		return scaleFactor;
+	}
+
+	public void setScaleFactor(double scaleFactor) {
+		this.scaleFactor = scaleFactor;
 	}
 
 }

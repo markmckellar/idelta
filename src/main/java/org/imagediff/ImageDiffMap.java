@@ -142,7 +142,7 @@ public class ImageDiffMap {
 		
 			PixelCompareResult pcr = getPixelCompareResult();
 			//getPixelCompareResult().printQuickGraph(95);
-			pcr.refreshStats();
+			//pcr.refreshStats();
 			ImageDiffArea ida = this.getImageDiffArea();
 			ida.addPixeCompareList(pcr.getPixelCompareList(95,100), true);
 			ida.addPixeCompareList(pcr.getPixelCompareList(90,95), true);

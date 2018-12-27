@@ -57,9 +57,9 @@ public class PixelCompareResult  {
 		getPercentileImageIndexList().clear();
 		double maxColorDistance = 0.0;
 		double maxScale = 0.0;
-		double totalScale = 0.0;		
-		double meadian = getPixelCompareList().get(getPixelCompareList().size()/2).getColorDistanceScale();
-
+		double totalScale = 0.0;	
+		int medianPos = getPixelCompareList().size()/2;
+		double meadian = getPixelCompareList().get(medianPos).getColorDistanceScale();
 		
 		for(PixelCompare pc:getPixelCompareList())  {	
 			double colorDistance = pc.getColorDistance();
@@ -67,7 +67,7 @@ public class PixelCompareResult  {
 			double scale = pc.getColorDistanceScale();
 			totalScale += scale;
 			if(maxScale<scale) maxScale = scale;
-		}
+		} 
 		
 		setTotalScale(totalScale);
 		totalScale = 0.0;
@@ -97,8 +97,10 @@ public class PixelCompareResult  {
 		this.setMaxColorDistance(maxColorDistance);
 		this.setMaxScale(maxScale);
 		this.setMeadianScale(meadian);
-		this.setMeanScale( this.getTotalScale()/getPixelCompareList().size() );
-		this.setMeanMedianRatio(getMeanScale()/getMeadianScale());
+		this.setMeanScale( getTotalScale()/getPixelCompareList().size() );
+		
+		this.setMeanMedianRatio(getMeanScale()/(getMeadianScale()+0.000000001));
+
 		this.setTotalPixels(getPixelCompareList().size());
 		this.setPixlesDifferent(diffTotal);
 		this.setPixlesEqual(getPixelCompareList().size()-diffTotal);
@@ -107,7 +109,6 @@ public class PixelCompareResult  {
 		this.setMeanMeadianPositionRatio(getMeanPosition()/ (getPixelCompareList().size()/2.0) );
 		this.setMeanPositionPercent(getMeanPosition()/(getPixelCompareList().size()*1.0));
 		
-		//for(;percentile<100;percentile++) getPercentileList().add(lastPercentile);
 		/*
 		 *  To calculate the standard deviation of those numbers:
 			Work out the Mean (the simple average of the numbers)
