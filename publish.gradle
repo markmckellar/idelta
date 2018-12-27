@@ -1,0 +1,89 @@
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'imagediff'
+    publishedGroupId = 'org.imagediff'
+    libraryName = 'imagediff'
+    artifact = 'imagediff'
+    artifactJar = "build/libs/imagediff.jar"
+    libraryDescription = 'a simple light weight server to simplify service mappings'
+    siteUrl = 'https://github.com/markmckellar/imagediff'
+    gitUrl = 'https://github.com/markmckellar/imagediffgit'
+    libraryVersion = '20181216.2'
+    developerId = 'mdm'
+    developerName = 'Mark McKellar'
+    developerEmail = 'mckellar.mm@gmail.com'
+    licenseName = 'MIT'
+    licenseUrl = 'https://opensource.org/licenses/MIT'
+    allLicenses = ["MIT"]
+}
+
+group = publishedGroupId
+version = libraryVersion
+
+def pomConfig = {
+    licenses {
+        license {
+            name libraryName
+            url siteUrl
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id developerId
+            name developerName
+            email developerEmail
+        }
+    }
+    
+    scm {
+       url siteUrl
+    }
+}
+
+publishing {
+    publications {
+        imagediff(MavenPublication) {
+            from components.java
+            groupId publishedGroupId
+            artifactId artifact
+            version libraryVersion
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', libraryDescription)
+                root.appendNode('name', libraryName)
+                root.appendNode('url', siteUrl)
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    publications = ['imagediff']
+    configurations = ['archives']
+    override = true
+    pkg {
+        repo = bintrayRepo
+        name = bintrayName
+        desc = libraryDescription
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = allLicenses
+        dryRun = false
+        publish = true
+        override = false
+        publicDownloadNumbers = true
+       version {
+            name = libraryVersion
+            desc = libraryDescription
+            released = new Date()
+            vcsTag = libraryVersion
+        }
+    }
+}

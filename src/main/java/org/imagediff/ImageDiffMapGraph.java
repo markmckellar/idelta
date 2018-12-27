@@ -10,10 +10,11 @@ public class ImageDiffMapGraph {
 	public ImageDiffMapGraph(PixelCompareResult pcr,int barLength)
 	{
 		this.percentileGraph = new ArrayList<String>();
-		int[] graph = new int[100];
+		int[] graph = new int[101];
 		for(int i=0;i<graph.length;i++) graph[i] = 0;
 		for(PixelCompare pc:pcr.getPixelCompareList())  {
-			graph[Double.valueOf(Math.round(pc.getColorDistanceScale()*100)).intValue()]++;
+			int graphValue = Double.valueOf(Math.round(pc.getColorDistanceScale()*100)).intValue();
+			graph[graphValue]++;
 			}
 		
 		int max = 0;

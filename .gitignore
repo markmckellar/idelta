@@ -4,4 +4,4 @@
 /.settings/
 /bin/
 /local.properties
-/publish.gradle
+/build/
