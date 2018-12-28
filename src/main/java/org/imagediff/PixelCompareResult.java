@@ -35,7 +35,7 @@ public class PixelCompareResult  {
 		refreshStats();
 	}
 
-	public List<PixelCompare> getPixelCompareList(int lowerPercentile, int upperPercentile) {
+	public List<PixelCompare> getPixelCompareList(int lowerPercentile, int upperPercentile,ImageDiffConfig config) {
 		List<PixelCompare> pixelCompareList = new ArrayList<PixelCompare>();
 		
 		int startIndex = this.getPercentileImageIndex(lowerPercentile);
@@ -43,8 +43,10 @@ public class PixelCompareResult  {
 		
 		for(int i=startIndex;i<endIndex;i++) {
 			PixelCompare pc = getPixelCompareList().get(i);
-			if(pc.getColorDistanceScale()>getPercentile(lowerPercentile) &&
-					pc.getColorDistanceScale()<=getPercentile(upperPercentile))
+			if(
+					pc.getColorDistanceScale()>getPercentile(lowerPercentile) &&
+					pc.getColorDistanceScale()<=getPercentile(upperPercentile) &&
+					pc.getColorDistanceScale()>=config.getColorScaleThreshold()) 
 				pixelCompareList.add(pc);
 		}
 		return(pixelCompareList);

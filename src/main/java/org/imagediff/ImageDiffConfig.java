@@ -16,6 +16,8 @@ public class ImageDiffConfig {
 	private String outJsonFile = "";
 	private int compareMargin = 1;
 	private double scaleFactor;
+	private int minPixlesInArea;
+	private double colorScaleThreshold;
 	
 	public  static ImageDiffConfig imageDiffConfigFromFile(String imageDiffConfigFile) throws Exception {
 		
@@ -87,6 +89,22 @@ public class ImageDiffConfig {
 
 	public void setScaleFactor(double scaleFactor) {
 		this.scaleFactor = scaleFactor;
+	}
+
+	public int getMinPixlesInArea() {
+		return minPixlesInArea;
+	}
+
+	public void setMinPixlesInArea(int minPixlesInArea) {
+		this.minPixlesInArea = minPixlesInArea;
+	}
+
+	public double getColorScaleThreshold() {
+		return colorScaleThreshold;
+	}
+
+	public void setColorScaleThreshold(double colorScaleThreshold) {
+		this.colorScaleThreshold = colorScaleThreshold;
 	}
 
 }

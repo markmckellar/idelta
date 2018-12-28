@@ -20,7 +20,7 @@ import com.google.gson.reflect.TypeToken;
 public class ImageDiff
 {
 	private ImageDiffMap imageDiffMap;
-	private ImageDiffConfig imageDiffConfig;
+	private ImageDiffConfig config;
 	private int width;
 	private int height;
 	
@@ -54,21 +54,20 @@ public class ImageDiff
 	 */
 	public ImageDiff(ImageDiffConfig imageDiffConfig) throws Exception
 	{
-		this.setImageDiffConfig(imageDiffConfig);
+		this.setConfig(imageDiffConfig);
 		this.setImageDiffMap(imageDiffMap);
 		BufferedImage img1 = ImageIO.read( new File(imageDiffConfig.getInFile1()));
 		BufferedImage img2 = ImageIO.read( new File(imageDiffConfig.getInFile2()));
-		if(getImageDiffConfig().getScaleFactor()!=0.0 &&
-				getImageDiffConfig().getScaleFactor()!=10.0)
+		if(getConfig().getScaleFactor()!=0.0 &&
+				getConfig().getScaleFactor()!=10.0)
 		{
-			img1 = this.getScaledImage(img1, getImageDiffConfig().getScaleFactor());
-			img2 = this.getScaledImage(img2, getImageDiffConfig().getScaleFactor());
+			img1 = this.getScaledImage(img1, getConfig().getScaleFactor());
+			img2 = this.getScaledImage(img2, getConfig().getScaleFactor());
 
 		}
 		setImageDiffMap(new ImageDiffMap(
 				img1,img2,
-				Color.BLACK,
-				imageDiffConfig.getCompareMargin()) );
+				getConfig()) );
 		this.setWidth(img1.getWidth());
 		this.setHeight(img2.getHeight());
 	
@@ -130,8 +129,8 @@ public class ImageDiff
 	}
 	
 	public void writeOutJsonFile() throws Exception {
-		if(!imageDiffConfig.getOutJsonFile().isEmpty()) {
-			Path path = Paths.get(getImageDiffConfig().getOutJsonFile());
+		if(!getConfig().getOutJsonFile().isEmpty()) {
+			Path path = Paths.get(getConfig().getOutJsonFile());
 			Files.write(path, toJson().getBytes());
 			Files.readAllBytes( path );
 		}
@@ -139,14 +138,14 @@ public class ImageDiff
 	
 	
 	public void writeOutImageFile() throws Exception {
-		if(getImageDiffMap().getDiffImage()!=null && !getImageDiffConfig().getOutImageFile().isEmpty())
+		if(getImageDiffMap().getDiffImage()!=null && !getConfig().getOutImageFile().isEmpty())
 		{
 			BufferedImage anotatedImage = getImageDiffMap().getAnnotatedBufferedImage(
 					getImageDiffMap().getImage1(),
 					new BasicStroke(2.0f),
 					Color.white);
 		
-			File annotatedBufferedImageFile = new File(getImageDiffConfig().getOutImageFile());	
+			File annotatedBufferedImageFile = new File(getConfig().getOutImageFile());	
 			ImageIO.write(overlayImage(
 		    		getImageDiffMap().getImage2(),
 		    		//imageDiffMap.getDiffImage()
@@ -164,13 +163,6 @@ public class ImageDiff
 		this.imageDiffMap = imageDiffMap;
 	}
 
-	public ImageDiffConfig getImageDiffConfig() {
-		return imageDiffConfig;
-	}
-
-	public void setImageDiffConfig(ImageDiffConfig imageDiffConfig) {
-		this.imageDiffConfig = imageDiffConfig;
-	}
 
 	public int getWidth() {
 		return width;
@@ -186,6 +178,14 @@ public class ImageDiff
 
 	public void setHeight(int height) {
 		this.height = height;
+	}
+
+	public ImageDiffConfig getConfig() {
+		return config;
+	}
+
+	public void setConfig(ImageDiffConfig config) {
+		this.config = config;
 	}
 
 }

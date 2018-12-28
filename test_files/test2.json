@@ -3,5 +3,8 @@
   "inFile2": "test_files/sitting_redCouch.jpg",
   "outImageFile": "test_files/test_output/test2.png",
   "outJsonFile": "test_files/test_output/test3.png",
-  "compareMargin": 20
+  "compareMargin": 30,
+  "scaleFactor":1.0,
+  "minPixlesInArea":100,
+  "colorScaleThreshold":0.12
 }

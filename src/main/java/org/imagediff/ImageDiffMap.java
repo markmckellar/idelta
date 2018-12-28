@@ -15,17 +15,20 @@ public class ImageDiffMap {
 	transient private BufferedImage image1;
 	transient private BufferedImage image2;
 	transient private BufferedImage diffImage;
-	transient private Color diffColor;
+	private transient ImageDiffConfig config;
 	private PixelCompareResult pixelCompareResult;
 	private ImageDiffArea imageDiffArea;
 	
-	public ImageDiffMap(BufferedImage image1, BufferedImage image2,Color diffColor,int margin) {
+	public ImageDiffMap(BufferedImage image1, BufferedImage image2,ImageDiffConfig imageDiffConfig) {
 		super();
+		this.setConfig(imageDiffConfig);
 		this.image1 = image1;
 		this.image2 = image2;
 		this.setDiffImage(null);
-		this.setDiffColor(diffColor);
-		this.setImageDiffArea(new ImageDiffArea(margin));
+		int compareMargin = getConfig().getCompareMargin();
+		if(compareMargin==0) compareMargin = 
+				Double.valueOf(image1.getWidth()*image1.getHeight()*0.000014468).intValue();
+		this.setImageDiffArea(new ImageDiffArea(compareMargin));
 		resetData();
 	}
 	
@@ -134,7 +137,6 @@ public class ImageDiffMap {
 							new Point2D.Double((double)x, (double)y), 
 							getImage1().getRGB(x, y), 
 							getImage2().getRGB(x, y) );	
-					
 					getPixelCompareResult().addPixelCompare(pixelCompare);
 				}
 			}
@@ -144,10 +146,13 @@ public class ImageDiffMap {
 			//getPixelCompareResult().printQuickGraph(95);
 			//pcr.refreshStats();
 			ImageDiffArea ida = this.getImageDiffArea();
-			ida.addPixeCompareList(pcr.getPixelCompareList(95,100), true);
-			ida.addPixeCompareList(pcr.getPixelCompareList(90,95), true);
-			ida.addPixeCompareList(pcr.getPixelCompareList(85,90), true);
-			ida.addPixeCompareList(pcr.getPixelCompareList(80,85), true);
+			ida.addPixeCompareList(pcr.getPixelCompareList(95,100,getConfig()), true);
+			ida.addPixeCompareList(pcr.getPixelCompareList(90,95,getConfig()), true);
+			ida.addPixeCompareList(pcr.getPixelCompareList(85,90,getConfig()), true);
+			ida.addPixeCompareList(pcr.getPixelCompareList(80,85,getConfig()), true);
+		
+			int removePixleThreshold = this.getConfig().getMinPixlesInArea();
+			if(removePixleThreshold==0) removePixleThreshold = Double.valueOf(pcr.getTotalPixels()*0.00005).intValue();
 			ida.removeSmallPixelCompareAreas(100);
 		}
 		
@@ -178,13 +183,7 @@ public class ImageDiffMap {
 		this.diffImage = diffImage;
 	}
 
-	public Color getDiffColor() {
-		return diffColor;
-	}
-
-	public void setDiffColor(Color diffColor) {
-		this.diffColor = diffColor;
-	}
+	
 
 	public PixelCompareResult getPixelCompareResult() {
 		return pixelCompareResult;
@@ -201,6 +200,16 @@ public class ImageDiffMap {
 	public void setImageDiffArea(ImageDiffArea imageDiffArea) {
 		this.imageDiffArea = imageDiffArea;
 	}
+
+	public ImageDiffConfig getConfig() {
+		return config;
+	}
+
+	public void setConfig(ImageDiffConfig config) {
+		this.config = config;
+	}
+
+	
 
 
 
