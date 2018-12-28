@@ -9,6 +9,8 @@ import java.awt.Stroke;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ImageDiffMap {
@@ -156,10 +158,19 @@ public class ImageDiffMap {
 			ida.removeSmallPixelCompareAreas(100);
 		}
 		
+		List<PixelCompareArea> pixelCompareAreaRemoveList = new ArrayList<PixelCompareArea>();
 		for(PixelCompareArea pca:getImageDiffArea().getPixelCompareAreaList()) 
+		{
 			pca.fillBoundingBox();
-			
-		this.setDiffImage(diffImage);
+			if(
+					(pca.getPixelCompareResult().getStandardDeviation()/
+							getPixelCompareResult().getStandardDeviation() <= getConfig().getStandardDeviationRatioThreashold() ))
+					pixelCompareAreaRemoveList.add(pca);
+		}	
+		for(PixelCompareArea pca:pixelCompareAreaRemoveList) 
+			getImageDiffArea().getPixelCompareAreaList().remove(pca);
+		
+		setDiffImage(diffImage);
 	}
 		
 	public BufferedImage getImage1() {

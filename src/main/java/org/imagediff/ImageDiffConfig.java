@@ -18,6 +18,7 @@ public class ImageDiffConfig {
 	private double scaleFactor;
 	private int minPixlesInArea;
 	private double colorScaleThreshold;
+	private double standardDeviationRatioThreashold;
 	
 	public  static ImageDiffConfig imageDiffConfigFromFile(String imageDiffConfigFile) throws Exception {
 		
@@ -105,6 +106,14 @@ public class ImageDiffConfig {
 
 	public void setColorScaleThreshold(double colorScaleThreshold) {
 		this.colorScaleThreshold = colorScaleThreshold;
+	}
+
+	public double getStandardDeviationRatioThreashold() {
+		return standardDeviationRatioThreashold;
+	}
+
+	public void setStandardDeviationRatioThreashold(double standardDeviationRatioThreashold) {
+		this.standardDeviationRatioThreashold = standardDeviationRatioThreashold;
 	}
 
 }
